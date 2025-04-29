@@ -1,0 +1,93 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import compression from "compression";
+import { errorHandler } from "./utils/error.utils.js";
+import logger from "./config/logger.js";
+
+// Import routes
+// import authRoutes from "./routes/auth.routes.js";
+// import userRoutes from "./routes/user.routes.js";
+// import adminRoutes from "./routes/admin.routes.js";
+// import serviceRoutes from "./routes/service.routes.js";
+// import bookingRoutes from "./routes/booking.routes.js";
+// import leadRoutes from "./routes/lead.routes.js";
+// import webhookRoutes from "./routes/webhook.routes.js";
+// import reportRoutes from "./routes/report.routes.js";
+
+const app = express();
+
+// Set security HTTP headers
+app.use(helmet());
+
+// Development logging
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+} else {
+  app.use(
+    morgan("combined", {
+      stream: { write: (message) => logger.info(message.trim()) },
+    })
+  );
+}
+
+// Rate limiting
+const limiter = rateLimit({
+  max: 100, // 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+app.use("/api", limiter);
+
+// Body parser
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
+
+// Compression
+app.use(compression());
+
+// CORS
+app.use(cors());
+
+// Routes
+// app.use("/api/auth", authRoutes);
+// app.use("/api/users", userRoutes);
+// app.use("/api/admins", adminRoutes);
+// app.use("/api/services", serviceRoutes);
+// app.use("/api/bookings", bookingRoutes);
+// app.use("/api/leads", leadRoutes);
+// app.use("/api/webhooks", webhookRoutes);
+// app.use("/api/reports", reportRoutes);
+
+// Health check route
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Server is running",
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// 404 handler
+app.all("*", (req, res, next) => {
+  res.status(404).json({
+    status: "fail",
+    message: `Can't find ${req.originalUrl} on this server!`,
+  });
+});
+
+// Global error handler
+app.use(errorHandler);
+
+export default app;
