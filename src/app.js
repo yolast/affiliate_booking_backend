@@ -8,9 +8,11 @@ import xss from "xss-clean";
 import compression from "compression";
 import { errorHandler } from "./utils/error.utils.js";
 import logger from "./config/logger.js";
+import cookieParser from "cookie-parser";
 
 // Import routes
 // import authRoutes from "./routes/auth.routes.js";
+import affiliateRoutes from "./routes/affiliate.routes.js";
 // import userRoutes from "./routes/user.routes.js";
 // import adminRoutes from "./routes/admin.routes.js";
 // import serviceRoutes from "./routes/service.routes.js";
@@ -46,6 +48,8 @@ app.use("/api", limiter);
 // Body parser
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+// server.js (snippet)
+app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
@@ -57,10 +61,23 @@ app.use(xss());
 app.use(compression());
 
 // CORS
-app.use(cors());
+const allowedOrigins = ["http://localhost:5173", "https://yolast.com"];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
 
 // Routes
 // app.use("/api/auth", authRoutes);
+app.use("/api/affiliates", affiliateRoutes);
 // app.use("/api/users", userRoutes);
 // app.use("/api/admins", adminRoutes);
 // app.use("/api/services", serviceRoutes);

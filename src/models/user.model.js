@@ -26,7 +26,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: [8, "Password must be at least 8 characters long"],
-      select: false,
     },
     role: {
       type: String,
@@ -109,10 +108,9 @@ userSchema.pre("save", async function (next) {
 });
 
 // Method to compare password
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
 };
-
 // Method to get user's district and state for admin assignment
 userSchema.methods.getRegionInfo = function () {
   return {

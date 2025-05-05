@@ -1,8 +1,8 @@
 // utills/generateToken.js
 import jwt from "jsonwebtoken";
 
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const generateToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };

@@ -1,38 +1,32 @@
-import { verifyToken } from "../utils/jwt.utils.js";
+import jwt from "jsonwebtoken";
 import { createError } from "../utils/error.utils.js";
 import logger from "../config/logger.js";
 
-//============ General authentication middleware
-export const authenticate = async (req, res, next) => {
+// ============ General authentication middleware ============
+export const authenticate = (req, res, next) => {
+  const token =
+    req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
+
+  if (!token) return next(createError(401, "No token provided"));
+
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      return next(createError(401, "Authentication token is missing"));
-    }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = verifyToken(token);
-    if (!decoded) return next(createError(401, "Invalid or expired token"));
-
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
-  } catch (error) {
-    logger.error("Authentication error:", error);
-    next(createError(401, "Authentication failed"));
+  } catch (err) {
+    return next(createError(401, "Invalid or expired token"));
   }
 };
 
-// ============= middleware to authorize roles super_admin, nsa, dsa, ssa
-export const authorizeRoles = (...roles) => {
-  return (req, res, next) => {
+// ============ roles middleware ============
+export const authorizeRoles =
+  (...roles) =>
+  (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return res
-        .status(403)
-        .json({ message: `Access denied for role: ${req.user.role}` });
+      return next(createError(403, "Access denied"));
     }
     next();
   };
-};
 
 //========== Middleware to check regional access
 export const hasRegionAccess = (regionType) => {
