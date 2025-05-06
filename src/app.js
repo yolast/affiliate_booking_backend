@@ -61,7 +61,7 @@ app.use(xss());
 app.use(compression());
 
 // CORS
-const allowedOrigins = ["http://localhost:5173", "https://yolast.com"];
+const allowedOrigins = ["http://localhost:5173", "https://www.yolast.com"];
 
 app.use(
   cors({
