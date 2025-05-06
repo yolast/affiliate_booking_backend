@@ -60,9 +60,7 @@ app.use(xss());
 // Compression
 app.use(compression());
 
-// CORS
-const allowedOrigins = ["http://localhost:5173", "https://www.yolast.com"];
-
+// === CORS
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -74,6 +72,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.options("*", cors());
 
 // Routes
 // app.use("/api/auth", authRoutes);
