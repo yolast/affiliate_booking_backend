@@ -9,7 +9,9 @@ import compression from "compression";
 import { errorHandler } from "./utils/error.utils.js";
 import logger from "./config/logger.js";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 
+dotenv.config();
 // Import routes
 // import authRoutes from "./routes/auth.routes.js";
 import affiliateRoutes from "./routes/affiliate.routes.js";
@@ -25,6 +27,22 @@ const app = express();
 
 // Set security HTTP headers
 app.use(helmet());
+
+app.use(
+  cors({
+    origin: "https://www.yolast.com", // allow only production frontend
+    credentials: true,
+  })
+);
+
+// Also add this if you're not already handling preflight
+app.options(
+  "*",
+  cors({
+    origin: "https://www.yolast.com",
+    credentials: true,
+  })
+);
 
 // Development logging
 if (process.env.NODE_ENV === "development") {
@@ -59,22 +77,6 @@ app.use(xss());
 
 // Compression
 app.use(compression());
-
-app.use(
-  cors({
-    origin: "https://www.yolast.com", // allow only production frontend
-    credentials: true,
-  })
-);
-
-// Also add this if you're not already handling preflight
-app.options(
-  "*",
-  cors({
-    origin: "https://www.yolast.com",
-    credentials: true,
-  })
-);
 
 // Routes
 // app.use("/api/auth", authRoutes);
