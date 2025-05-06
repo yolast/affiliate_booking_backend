@@ -6,6 +6,9 @@ export default [
       ecmaVersion: "latest",
       sourceType: "module",
     },
+    compilerOptions: {
+      moduleResolution: "node", // add this line.
+    },
     rules: {
       semi: ["error", "always"],
       quotes: ["error", "double"],
