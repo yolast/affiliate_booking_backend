@@ -30,7 +30,7 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: "https://www.yolast.com", // allow only production frontend
+    origin: process.env.CORS_ORIGIN, // allow only production frontend
     credentials: true,
   })
 );
@@ -39,7 +39,7 @@ app.use(
 app.options(
   "*",
   cors({
-    origin: "https://www.yolast.com",
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
   })
 );
