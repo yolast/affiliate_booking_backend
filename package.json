@@ -6,12 +6,14 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "build": "node --check src/index.js && eslint . --config eslint.config.js && echo \"✔️ Build + Lint passed.\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^9.26.0",
     "nodemon": "^3.1.4"
   },
   "dependencies": {
