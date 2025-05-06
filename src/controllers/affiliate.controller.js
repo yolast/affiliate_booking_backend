@@ -122,28 +122,10 @@ export const getAffiliateQR = async (req, res) => {
     }
 
     // Return existing QR code if already generated
-    if (user.qrCodeUrl) {
-      return res.status(200).json({ qrCodeUrl: user.qrCodeUrl });
+    if (!user.affiliateInfo?.qrCode) {
+      return res.status(400).json("qr code did not found");
     }
-
-    const referralLink = `${process.env.CLIENT_URL}/register?ref=${user._id}`;
-
-    // Generate QR image as base64
-    const qrDataUrl = await QRCode.toDataURL(referralLink);
-
-    // Upload base64 image to Cloudinary
-    const uploadRes = await uploadOnCloudinary(qrDataUrl, "affiliates/qrcodes");
-
-    if (!uploadRes?.secure_url) {
-      return res.status(500).json({ message: "Cloudinary upload failed" });
-    }
-
-    user.qrCodeUrl = uploadRes.secure_url;
-    await user.save();
-
-    console.log(user.qrCodeUrl);
-
-    res.status(200).json({ data: { qrCodeUrl: user.qrCodeUrl } });
+    return res.status(200).json({ qrCodeUrl: user.affiliateInfo.qrCode });
   } catch (error) {
     console.error("QR Gen Error:", error);
     res.status(500).json({ message: "Failed to generate QR code" });
