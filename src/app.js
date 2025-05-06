@@ -61,19 +61,24 @@ app.use(xss());
 app.use(compression());
 
 // === CORS
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
+const allowedOrigins = ["http://localhost:5173", "https://www.yolast.com"];
 
-app.options("*", cors());
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow no origin (like Postman) or matched origin
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+// Always add this:
+app.options("*", cors(corsOptions));
 
 // Routes
 // app.use("/api/auth", authRoutes);
