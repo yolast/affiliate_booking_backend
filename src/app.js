@@ -60,25 +60,21 @@ app.use(xss());
 // Compression
 app.use(compression());
 
-// === CORS
-const allowedOrigins = ["http://localhost:5173", "https://www.yolast.com"];
+app.use(
+  cors({
+    origin: "https://www.yolast.com", // allow only production frontend
+    credentials: true,
+  })
+);
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow no origin (like Postman) or matched origin
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
-// Always add this:
-app.options("*", cors(corsOptions));
+// Also add this if you're not already handling preflight
+app.options(
+  "*",
+  cors({
+    origin: "https://www.yolast.com",
+    credentials: true,
+  })
+);
 
 // Routes
 // app.use("/api/auth", authRoutes);
