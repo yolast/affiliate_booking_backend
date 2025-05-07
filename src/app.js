@@ -29,7 +29,27 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 const app = express();
 
 // ======== CORS
-app.use(cors());
+const allowedOrigins = [process.env.CORS_ORIGIN, "https://www.yolast.com"];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Important for cookies
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// Handle preflight OPTIONS requests globally
+app.options("*", cors());
 
 // Set security HTTP headers
 app.use(helmet());
