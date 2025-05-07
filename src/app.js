@@ -29,7 +29,7 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 const app = express();
 
 // ======== CORS
-const allowedOrigins = [process.env.CORS_ORIGIN, "https://www.yolast.com"];
+const allowedOrigins = [process.env.CORS_ORIGIN, "http://localhost:5173"];
 
 // Update your CORS middleware configuration
 app.use(
@@ -43,6 +43,12 @@ app.use(
 
 // Explicit OPTIONS handler for all routes
 app.options("*", cors());
+
+app.use((req, res, next) => {
+  console.log("Request Headers:", req.headers);
+  console.log("Request Origin:", req.headers.origin);
+  next();
+});
 
 // Set security HTTP headers
 app.use(helmet());

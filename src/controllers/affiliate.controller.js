@@ -113,6 +113,7 @@ export const generateAffiliateQR = async (req, res) => {
 export const getAffiliateQR = async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log(userId);
     const user = await User.findById(userId);
 
     if (!user || user.role !== "affiliate") {
