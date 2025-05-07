@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
-// import helmet from "helmet";
-// import morgan from "morgan";
-// import rateLimit from "express-rate-limit";
-// import mongoSanitize from "express-mongo-sanitize";
-// import xss from "xss-clean";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
 import compression from "compression";
 import { errorHandler } from "./utils/error.utils.js";
 import logger from "./config/logger.js";
@@ -29,7 +29,7 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 const app = express();
 
 // ======== CORS
-const definedAllowedOrigins = ["https://www.yolast.com"];
+const definedAllowedOrigins = ["https://yolast.com"];
 if (process.env.CORS_ORIGIN) {
   definedAllowedOrigins.push(process.env.CORS_ORIGIN);
 }
@@ -80,26 +80,26 @@ app.use((req, res, next) => {
 });
 
 // Set security HTTP headers
-// app.use(helmet());
+app.use(helmet());
 
 // Development logging
-// if (process.env.NODE_ENV === "development") {
-//   app.use(morgan("dev"));
-// } else {
-//   app.use(
-//     morgan("combined", {
-//       stream: { write: (message) => logger.info(message.trim()) },
-//     })
-//   );
-// }
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+} else {
+  app.use(
+    morgan("combined", {
+      stream: { write: (message) => logger.info(message.trim()) },
+    })
+  );
+}
 
-// // Rate limiting
-// const limiter = rateLimit({
-//   max: 100, // 100 requests per windowMs
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   message: "Too many requests from this IP, please try again after 15 minutes",
-// });
-// app.use("/api", limiter);
+// Rate limiting
+const limiter = rateLimit({
+  max: 100, // 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+app.use("/api", limiter);
 
 // Body parser
 app.use(express.json({ limit: "10kb" }));
@@ -108,13 +108,13 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
-// app.use(mongoSanitize());
+app.use(mongoSanitize());
 
 // Data sanitization against XSS
-// app.use(xss());
+app.use(xss());
 
 // Compression
-// app.use(compression());
+app.use(compression());
 
 // Routes
 // app.use("/api/auth", authRoutes);
