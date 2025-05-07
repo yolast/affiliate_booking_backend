@@ -24,7 +24,11 @@ export const registerAffiliate = async (req, res) => {
       address: { city, district, state, country },
     });
 
-    res.status(201).json({ success: true, userId: newUser._id });
+    res
+      .status(201)
+      .header("Access-Control-Allow-Origin", "https://www.yolast.com")
+      .header("Access-Control-Allow-Credentials", "true")
+      .json({ success: true, userId: newUser._id });
   } catch (err) {
     console.error("Affiliate Registration Error:", err);
     res.status(500).json({ message: "Failed to register affiliate" });
