@@ -29,12 +29,7 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 const app = express();
 
 // ======== CORS
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    Credentials: true,
-  })
-);
+app.use(cors());
 
 // Set security HTTP headers
 app.use(helmet());
