@@ -28,24 +28,21 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 
 const app = express();
 
+// ======== CORS
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options("*", cors(corsOptions));
+
 // Set security HTTP headers
 app.use(helmet());
-
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN, // allow only production frontend
-    credentials: true,
-  })
-);
-
-// Also add this if you're not already handling preflight
-app.options(
-  "*",
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  })
-);
 
 // Development logging
 if (process.env.NODE_ENV === "development") {
