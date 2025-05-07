@@ -48,8 +48,8 @@ app.use(
   })
 );
 
-// Handle preflight OPTIONS requests globally
-app.options("*", cors());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // Set security HTTP headers
 app.use(helmet());
