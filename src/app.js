@@ -94,16 +94,17 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Rate limiting
-const limiter = rateLimit({
-  max: 100, // 100 requests per windowMs
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  message: "Too many requests from this IP, please try again after 15 minutes",
-});
-app.use("/api", limiter);
+// const limiter = rateLimit({
+//   max: 100, // 100 requests per windowMs
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   message: "Too many requests from this IP, please try again after 15 minutes",
+// });
+// app.use("/api", limiter);
 
 // Body parser
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+app.set("trust proxy", true);
 // server.js (snippet)
 app.use(cookieParser());
 
