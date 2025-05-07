@@ -10,8 +10,11 @@ import { errorHandler } from "./utils/error.utils.js";
 import logger from "./config/logger.js";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+//=========== configure dotenv
+dotenv.config({
+  path: "./.env",
+});
 
-dotenv.config();
 // Import routes
 // import authRoutes from "./routes/auth.routes.js";
 import affiliateRoutes from "./routes/affiliate.routes.js";

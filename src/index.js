@@ -2,8 +2,10 @@ import dotenv from "dotenv";
 import app from "./app.js";
 import logger from "./config/logger.js";
 import mongoose from "mongoose";
-// Load environment variables
-dotenv.config();
+//=========== configure dotenv
+dotenv.config({
+  path: "./.env",
+});
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
