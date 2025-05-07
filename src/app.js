@@ -71,7 +71,7 @@ app.options("*", cors(corsConfiguration)); // Use the SAME configuration here
 // );
 
 // Explicit OPTIONS handler for all routes
-app.options("*", cors());
+// app.options("*", cors());
 
 app.use((req, res, next) => {
   console.log("Request Headers:", req.headers);
