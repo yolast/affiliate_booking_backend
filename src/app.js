@@ -31,23 +31,17 @@ const app = express();
 // ======== CORS
 const allowedOrigins = [process.env.CORS_ORIGIN, "https://www.yolast.com"];
 
+// Update your CORS middleware configuration
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true, // Important for cookies
+    origin: allowedOrigins,
+    credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
+// Explicit OPTIONS handler for all routes
 app.options("*", cors());
 
 // Set security HTTP headers
