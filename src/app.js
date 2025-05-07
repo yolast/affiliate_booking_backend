@@ -29,24 +29,14 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 const app = express();
 
 // ======== CORS
-const definedAllowedOrigins = ["https://yolast.com"];
-if (process.env.CORS_ORIGIN) {
-  definedAllowedOrigins.push(process.env.CORS_ORIGIN);
-}
+// const definedAllowedOrigins = ["https://yolast.com"];
+// if (process.env.CORS_ORIGIN) {
+//   definedAllowedOrigins.push(process.env.CORS_ORIGIN);
+// }
 const corsConfiguration = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    // and requests from whitelisted origins
-    if (!origin || definedAllowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      logger.error(`CORS Error: Origin ${origin} not allowed.`); // Log denied origins
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Ensure OPTIONS is present
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Add common headers
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 };
 
 // Apply the configured CORS options to all routes, including preflight OPTIONS requests.
@@ -56,7 +46,7 @@ app.use(cors(corsConfiguration));
 // The explicit app.options line below can be a robust way to ensure OPTIONS requests are handled
 // with your specific configuration, especially if there are complexities in routing.
 // Make sure it uses the SAME configuration.
-app.options("*", cors(corsConfiguration)); // Use the SAME configuration here
+// app.options("*", cors(corsConfiguration)); // Use the SAME configuration here
 
 // const allowedOrigins = [process.env.CORS_ORIGIN, "http://localhost:5173"];
 
