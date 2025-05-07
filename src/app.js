@@ -29,17 +29,46 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 const app = express();
 
 // ======== CORS
-const allowedOrigins = [process.env.CORS_ORIGIN, "http://localhost:5173"];
+const definedAllowedOrigins = ["https://www.yolast.com"];
+if (process.env.CORS_ORIGIN) {
+  definedAllowedOrigins.push(process.env.CORS_ORIGIN);
+}
+const corsConfiguration = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    // and requests from whitelisted origins
+    if (!origin || definedAllowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      logger.error(`CORS Error: Origin ${origin} not allowed.`); // Log denied origins
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Ensure OPTIONS is present
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Add common headers
+};
+
+// Apply the configured CORS options to all routes, including preflight OPTIONS requests.
+// This should be one of the first middleware.
+app.use(cors(corsConfiguration));
+
+// The explicit app.options line below can be a robust way to ensure OPTIONS requests are handled
+// with your specific configuration, especially if there are complexities in routing.
+// Make sure it uses the SAME configuration.
+app.options("*", cors(corsConfiguration)); // Use the SAME configuration here
+
+// const allowedOrigins = [process.env.CORS_ORIGIN, "http://localhost:5173"];
 
 // Update your CORS middleware configuration
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
-);
+// app.use(
+//   cors({
+//     origin: allowedOrigins,
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+//   })
+// );
 
 // Explicit OPTIONS handler for all routes
 app.options("*", cors());
