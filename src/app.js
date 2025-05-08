@@ -29,7 +29,7 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 const app = express();
 
 // // ============== CORS
-const definedAllowedOrigins = ["https://yolast.com", "http://localhost:5173"];
+const definedAllowedOrigins = ["https://www.yolast.com", "https://yolast.com"];
 if (process.env.CORS_ORIGIN) {
   definedAllowedOrigins.push(process.env.CORS_ORIGIN);
 }
