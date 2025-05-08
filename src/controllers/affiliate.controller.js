@@ -15,6 +15,11 @@ export const registerAffiliate = async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
+    const phoneExists = await User.findOne({ phone });
+    if (phoneExists) {
+      return res.status(400).json({ message: "Phone already registered" });
+    }
+
     const newUser = await User.create({
       name,
       email,
