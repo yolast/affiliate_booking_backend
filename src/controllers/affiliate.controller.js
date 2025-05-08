@@ -48,7 +48,7 @@ export const loginAffiliate = async (req, res) => {
       .cookie("accessToken", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "Strict",
+        sameSite: "None",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(200)
