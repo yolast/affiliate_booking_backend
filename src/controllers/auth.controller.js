@@ -56,3 +56,9 @@ export const registerUser = async (req, res, next) => {
     next(error);
   }
 };
+
+// current user for keeping login state
+export const getCurrentUser = (req, res) => {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+  res.status(200).json({ user: req.user });
+};

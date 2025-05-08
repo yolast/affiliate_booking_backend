@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import rateLimit from "express-rate-limit";
+// import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
 import compression from "compression";
@@ -15,8 +15,8 @@ dotenv.config({
   path: "./.env",
 });
 
-// Import routes
-// import authRoutes from "./routes/auth.routes.js";
+// //=================Import routes
+import authRoutes from "./routes/auth.routes.js";
 import affiliateRoutes from "./routes/affiliate.routes.js";
 // import userRoutes from "./routes/user.routes.js";
 // import adminRoutes from "./routes/admin.routes.js";
@@ -28,8 +28,8 @@ import affiliateRoutes from "./routes/affiliate.routes.js";
 
 const app = express();
 
-// ======== CORS
-const definedAllowedOrigins = ["https://yolast.com"];
+// // ============== CORS
+const definedAllowedOrigins = ["https://yolast.com", "http://localhost:5173"];
 if (process.env.CORS_ORIGIN) {
   definedAllowedOrigins.push(process.env.CORS_ORIGIN);
 }
@@ -73,11 +73,11 @@ app.options("*", cors(corsConfiguration)); // Use the SAME configuration here
 // Explicit OPTIONS handler for all routes
 // app.options("*", cors());
 
-app.use((req, res, next) => {
-  console.log("Request Headers:", req.headers);
-  console.log("Request Origin:", req.headers.origin);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log("Request Headers:", req.headers);
+//   console.log("Request Origin:", req.headers.origin);
+//   next();
+// });
 
 // Set security HTTP headers
 app.use(helmet());
@@ -101,7 +101,7 @@ if (process.env.NODE_ENV === "development") {
 // });
 // app.use("/api", limiter);
 
-// Body parser
+// // ===============Body parser
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.set("trust proxy", true);
@@ -117,8 +117,8 @@ app.use(xss());
 // Compression
 app.use(compression());
 
-// Routes
-// app.use("/api/auth", authRoutes);
+////============= Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/affiliates", affiliateRoutes);
 // app.use("/api/users", userRoutes);
 // app.use("/api/admins", adminRoutes);
