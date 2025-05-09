@@ -4,38 +4,104 @@ import QRCode from "qrcode";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import User from "../models/user.model.js";
 import generateToken from "../utils/generateToken.js";
+import { generatePartnerId } from "../utils/generatePartnerId.js";
 
 export const registerAffiliate = async (req, res) => {
   try {
-    const { name, email, phone, city, district, state, country, password } =
-      req.body;
+    const {
+      name,
+      email,
+      phone,
+      address,
+      password,
+      businessType,
+      preferredLanguage,
+      promotionMethod,
+      panNumber,
+      referralCode,
+      agreementAccepted,
+      signature,
+    } = req.body;
 
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: "Email already registered" });
+    // 1. Basic Validations
+    if (!name || !email || !phone || !address?.state || !address?.country) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Required fields missing" });
     }
 
-    const phoneExists = await User.findOne({ phone });
-    if (phoneExists) {
-      return res.status(400).json({ message: "Phone already registered" });
+    // 2. Check for existing user (based on email or phone)
+    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ success: false, message: "User already registered" });
     }
 
+    // 3. Generate Partner ID
+    const partnerId = generatePartnerId(address.state, address.country);
+
+    // 4. Documents upload to cloudinary
+    const aadharUpload = await uploadOnCloudinary(
+      req.files.aadhar[0].buffer,
+      "affiliates/aadhar"
+    );
+    const panUpload = await uploadOnCloudinary(
+      req.files.panCard[0].buffer,
+      "affiliates/pan"
+    );
+    const selfieUpload = req.files.selfieFile?.[0]
+      ? await uploadOnCloudinary(
+          req.files.selfie[0].buffer,
+          "affiliates/selfies"
+        )
+      : null;
+
+    const documents = {
+      aadhar: aadharUpload.secure_url,
+      panCard: panUpload.secure_url,
+      selfie: selfieUpload?.secure_url || null,
+    };
+
+    // 5. Create new user in data base
     const newUser = await User.create({
       name,
       email,
       phone,
       password,
       role: "affiliate",
-      address: { city, district, state, country },
+      address,
+      affiliateInfo: {
+        partnerId,
+        businessType,
+        preferredLanguage,
+        promotionMethod,
+        panNumber,
+        referralCode,
+        documents,
+        agreement: {
+          accepted: agreementAccepted === "true" || agreementAccepted === true,
+          signature,
+        },
+      },
     });
 
-    res.status(201).json({ success: true, userId: newUser._id });
+    res.status(201).json({
+      success: true,
+      message: "Affiliate registered successfully",
+      data: {
+        name: newUser.name,
+        email: newUser.email,
+        partnerId: newUser.affiliateInfo.partnerId,
+      },
+    });
   } catch (err) {
     console.error("Affiliate Registration Error:", err);
     res.status(500).json({ message: "Failed to register affiliate" });
   }
 };
 
+// ========== login affiliate
 export const loginAffiliate = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -137,45 +203,6 @@ export const getAffiliateQR = async (req, res) => {
     res.status(500).json({ message: "Failed to generate QR code" });
   }
 };
-//========== Generate QR code for affiliate ❓ (not clear)
-// export const generateAffiliateQR = async (req, res, next) => {
-//   try {
-//     const userId = req.user.id;
-
-//     // Check if user is an affiliate
-//     const user = await User.findById(userId);
-
-//     if (!user) {
-//       return next(createError(404, "User not found"));
-//     }
-
-//     if (user.role !== "affiliate") {
-//       return next(createError(400, "Only affiliates can generate QR codes"));
-//     }
-
-//     // Generate QR code using Razorpay
-//     const qrCode = await generateQRCode(userId.toString(), {
-//       name: user.name,
-//       email: user.email,
-//       phone: user.phone,
-//     });
-
-//     // Update user with QR code
-//     user.affiliateInfo.qrCode = qrCode.image_url;
-//     await user.save();
-
-//     res.status(200).json({
-//       success: true,
-//       data: {
-//         qrCode: qrCode.image_url,
-//         qrId: qrCode.id,
-//       },
-//     });
-//   } catch (error) {
-//     logger.error("Error in generateAffiliateQR:", error);
-//     next(error);
-//   }
-// };
 
 //============  Get affiliate earnings  👍
 export const getAffiliateEarnings = async (req, res, next) => {

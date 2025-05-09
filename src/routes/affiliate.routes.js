@@ -12,6 +12,7 @@ import {
   authenticate,
   authorizeRoles,
 } from "../middlewares/auth.middleware.js";
+import upload from "../middlewares/uploads.js";
 
 const router = express.Router();
 
@@ -19,7 +20,15 @@ const router = express.Router();
 
 // @route   POST /api/affiliate/register
 // @desc    Register as an affiliate
-router.post("/register", registerAffiliate);
+router.post(
+  "/register",
+  upload.fields([
+    { name: "aadhar", maxCount: 1 },
+    { name: "panCard", maxCount: 1 },
+    { name: "selfie", maxCount: 1 },
+  ]),
+  registerAffiliate
+);
 
 // @route   POST /api/affiliate/login
 // @desc    Login as an affiliate

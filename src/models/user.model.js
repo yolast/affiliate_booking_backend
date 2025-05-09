@@ -48,21 +48,34 @@ const userSchema = new mongoose.Schema(
     // For affiliates
     affiliateInfo: {
       qrCode: String,
-      totalEarnings: {
-        type: Number,
-        default: 0,
-      },
-      availableBalance: {
-        type: Number,
-        default: 0,
-      },
+      totalEarnings: { type: Number, default: 0 },
+      availableBalance: { type: Number, default: 0 },
       bankDetails: {
         accountNumber: String,
         ifscCode: String,
         accountHolderName: String,
         bankName: String,
       },
+      businessType: {
+        type: String,
+        enum: ["company", "shop_owner", "individual"],
+      },
+      preferredLanguage: String,
+      promotionMethod: String, // e.g. ["field_visits", "social_media"]
+      panNumber: String,
+      referralCode: String,
+      documents: {
+        aadhar: String, // file path or Cloudinary URL
+        panCard: String,
+        selfie: String,
+      },
+      agreement: {
+        accepted: { type: Boolean, default: false },
+        signature: String,
+      },
+      partnerId: { type: String, unique: true }, // e.g. INTNMAXL1245
     },
+
     // For service providers
     serviceProviderInfo: {
       businessName: String,
