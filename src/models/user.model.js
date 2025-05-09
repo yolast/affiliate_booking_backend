@@ -59,6 +59,7 @@ const userSchema = new mongoose.Schema(
       businessType: {
         type: String,
         enum: ["company", "shop_owner", "individual"],
+        default: "individual",
       },
       preferredLanguage: String,
       promotionMethod: String, // e.g. ["field_visits", "social_media"]
